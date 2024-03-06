@@ -3,6 +3,8 @@ layout: about
 title: about
 permalink: /
 subtitle: Ph.D. Candidate in Computer Science at National University of Singapore
+"Courage isn’t just a matter of not being frightened, you know. 
+It’s being afraid and doing what you have to do anyway." -- *Doctor Who*
 
 profile:
   align: right
