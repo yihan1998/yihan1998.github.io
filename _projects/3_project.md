@@ -1,9 +1,8 @@
 ---
 layout: page
-title: Serverless with SmartNIC acceleration
+title: 'Serverless with SmartNIC acceleration'
 description: a project that redirects to another website
 img: assets/img/7.jpg
-redirect: https://unsplash.com
 importance: 3
 category: Research
 tags: Serverless, SmartNIC
