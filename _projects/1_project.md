@@ -4,7 +4,8 @@ title: Cygnus
 description: 
 img: assets/img/12.jpg
 importance: 1
-category: Scheduling, Dataplane OS
+category: Research
+tags: Dataplane OS, Scheduling
 related_publications: true
 ---
 
