@@ -52,8 +52,7 @@
       "startDate": "2016-09-01",
       "endDate": "2020-07-01",
       "courses": ["Linear Algebra","Calculus","Probability and Mathematical Statistics",
-                  "Combinatorics","Data Structures","Introduction to Theory of Computation",
-                  "Principles of Computer Organization","Assembly Language","Computer Architecture","Operating System"]
+                  "Combinatorics","Data Structures","Computer Architecture","Operating System"]
     }
   ],
   "awards": [
@@ -158,6 +157,10 @@
           "fluency": "Rusty"
         }
       ]
+    },
+    {
+      "name": "Techniques",
+      "icon": "fa-solid fa-hashtag",
     }
   ],
   "languages": [
