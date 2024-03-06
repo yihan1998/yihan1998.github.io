@@ -136,31 +136,20 @@
       "name": "Programming language",
       "icon": "fa-solid fa-hashtag",
       "keywords": [
-        {
-          "name": "C",
-          "fluency": "Excellent"
-        },
-        {
-          "name": "Assembly",
-          "fluency": "Proficient"
-        },
-        {
-          "name": "Verilog",
-          "fluency": "Familiar"
-        },
-        {
-          "name": "Go",
-          "fluency": "Familiar"
-        },
-        {
-          "name": "Rust",
-          "fluency": "Rusty"
-        }
+        "C",
+        "Assembly",
+        "Verilog",
+        "Go",
+        "Rust"
       ]
     },
     {
       "name": "Techniques",
       "icon": "fa-solid fa-hashtag",
+      "keywords": [
+        "Kernel module",
+        "LD_PRELOAD trick"
+      ]
     }
   ],
   "languages": [

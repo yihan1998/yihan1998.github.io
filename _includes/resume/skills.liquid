@@ -18,18 +18,12 @@
             {% endfor %}
             <td colspan="{{ i }}" class="list-group-category">{{ content.name }}</td>
           </tr>
-          {% for keyword in content.keywords %}
+          {% for item in content.keywords %}
             <tr>
-              {% for item in keyword.items %}
-               <tr>
-                <td class="list-group-name">
-                  <b>{{ item.name }}</b>
-                </td>
-                <td class="list-group-level">
-                  <b>{{ item.fluency }}</b>
-                </td>
-              </tr>
-              {% endfor %}
+              <td></td>
+              <td class="list-group-name">
+                <b>{{ item }}</b>
+              </td>
             </tr>
           {% endfor %}
         </tbody>
