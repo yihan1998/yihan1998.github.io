@@ -30,14 +30,14 @@
       "area": "Computer Science",
       "studyType": "Ph.D. Candidate",
       "startDate": "2020-08-01",
-      "endDate": "Now"
+      "endDate": "Current"
     },
     {
       "institution": "University of Chinese Academy of Sciences, Beijing, P.R.China",
       "location": "Beijing, P.R.China",
       "url": "https://english.ucas.ac.cn/",
       "area": "Computer Science and Technology",
-      "studyType": "Undergrad",
+      "studyType": "Bachelor",
       "startDate": "2016-09-01",
       "endDate": "2020-07-01",
       "courses": ["Linear Algebra","Calculus","Probability and Mathematical Statistics",
