@@ -1,21 +1,19 @@
 ---
 layout: post
 title: Event Notification
-date: 2023-04-25 10:14:00-0400
+date: 2024-03-06 11:14:00-0400
 description: an example of a blog post with table of contents on a sidebar
-tags: formatting toc sidebar
+tags: Linux
 categories: sample-posts
-giscus_comments: true
-related_posts: false
 toc:
   sidebar: left
 ---
 
-# Event Notification in 5 Minutes
+# TL;DR
 
-| Mechanism | Intro | Right aligned |
-| :----------- | :------------: | ------------: |
-| Poll       |    OG of event notification mecanism    |       right 1 |
-| Select       |    center 1    |       right 1 |
-| Epoll       |    center 2    |       right 2 |
-| Eventfd       |    center 3    |       right 3 |
+| Mechanism | Intro | Pros | Cons |
+| :----------- | :------------: | :------------: | :------------: |
+| Select       |    OG of event notification mechanisms    |    :white_check_mark:    |    :interrobang:    |
+| Poll       |   :raised_hand: I'm like you but with flexible set of file descriptors    |    :white_check_mark:    |    :interrobang:    |
+| Epoll       |   :raised_hands: I'm like you two but more scalable    |    :white_check_mark:    |    :interrobang:    |
+| Eventfd       |    :v:Here to provide lightweight notification    |    :white_check_mark:    |    :interrobang:    |
