@@ -9,9 +9,9 @@ categories: {Operating System}
 
 # Event Notification in 5 Minutes
 
-| Mechanism | Center aligned | Right aligned |
+| Mechanism | Intro | Right aligned |
 | :----------- | :------------: | ------------: |
-| Poll       |    center 1    |       right 1 |
+| Poll       |    OG of event notification mecanism    |       right 1 |
 | Select       |    center 1    |       right 1 |
 | Epoll       |    center 2    |       right 2 |
 | Eventfd       |    center 3    |       right 3 |

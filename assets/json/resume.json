@@ -25,7 +25,7 @@
   "education": [
     {
       "institution": "National University of Singapore",
-      "location": "Singapore\nSingapore",
+      "location": "Singapore",
       "url": "https://nus.edu.sg/",
       "area": "Computer Science",
       "studyType": "Ph.D. Candidate",
@@ -34,7 +34,7 @@
     },
     {
       "institution": "University of Chinese Academy of Sciences",
-      "location": "Beijing\nP.R.China",
+      "location": "Beijing,P.R.China",
       "url": "https://english.ucas.ac.cn/",
       "area": "Computer Science and Technology",
       "studyType": "Bachelor",
