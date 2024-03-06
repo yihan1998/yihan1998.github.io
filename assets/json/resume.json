@@ -24,8 +24,8 @@
   },
   "education": [
     {
-      "institution": "National University of Singapore, Singapore, Singapore",
-      "location": "Singapore, Singapore",
+      "institution": "National University of Singapore",
+      "location": "Singapore\nSingapore",
       "url": "https://nus.edu.sg/",
       "area": "Computer Science",
       "studyType": "Ph.D. Candidate",
@@ -33,15 +33,16 @@
       "endDate": "Now"
     },
     {
-      "institution": "University of Chinese Academy of Sciences, Beijing, P.R.China",
-      "location": "Beijing, P.R.China",
+      "institution": "University of Chinese Academy of Sciences",
+      "location": "Beijing\nP.R.China",
       "url": "https://english.ucas.ac.cn/",
       "area": "Computer Science and Technology",
       "studyType": "Bachelor",
       "startDate": "2016-09-01",
       "endDate": "2020-07-01",
       "courses": ["Linear Algebra","Calculus","Probability and Mathematical Statistics",
-                  "Combinatorics","Data Structures","Computer Architecture","Operating System"]
+                  "Combinatorics","Data Structures","Introduction to Theory of Computation",
+                  "Computer Architecture","Operating System"]
     }
   ],
   "work": [
@@ -96,13 +97,13 @@
       "keywords": [
         "Advanced GDB user",
         "Kernel module writer",
-        "LD_PRELOAD juggler"
+        "LD_PRELOAD conjuror"
       ]
     }
   ],
   "languages": [
     {
-      "language": "German",
+      "language": "Chinese",
       "fluency": "Native speaker",
       "icon": ""
     },
