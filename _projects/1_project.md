@@ -1,10 +1,10 @@
 ---
 layout: page
-title: project 1
-description: a project with a background image
+title: Cygnus
+description: 
 img: assets/img/12.jpg
 importance: 1
-category: work
+category: Scheduling, Dataplane OS
 related_publications: true
 ---
 
