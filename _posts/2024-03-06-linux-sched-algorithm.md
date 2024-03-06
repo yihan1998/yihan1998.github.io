@@ -1,8 +1,12 @@
 ---
 layout: post
-title: {Process Scheduling 101}
-date: 2024-03-06 11:15:16
-description: 
-tags: {Linux Kernel} {Scheduling}
-categories: {Operating System}
+title: Scheduling Algorithm
+date: 2023-04-25 10:14:00-0400
+description: an example of a blog post with table of contents on a sidebar
+tags: formatting toc sidebar
+categories: sample-posts
+giscus_comments: true
+related_posts: false
+toc:
+  sidebar: left
 ---
