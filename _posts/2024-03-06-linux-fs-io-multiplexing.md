@@ -58,7 +58,7 @@ toc:
 
 ## How `eventfd` works
 
-## How `eventfd` complements epoll
+## How `eventfd` complements `epoll`
 
 ## Example code
 
