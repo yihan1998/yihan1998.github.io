@@ -2,7 +2,7 @@
 layout: post
 title: System Calls 101
 date: 2024-03-09 14:14:00-0400
-description: Introduction to 
+description: Gatekeepers of the Kernel world
 tags: Linux
 categories: sample-posts
 toc:
