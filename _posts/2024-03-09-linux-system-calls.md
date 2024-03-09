@@ -2,7 +2,7 @@
 layout: post
 title: System Calls 101
 date: 2024-03-09 14:14:00-0400
-description: an example of a blog post with table of contents on a sidebar
+description: Introduction to 
 tags: Linux
 categories: sample-posts
 toc:
@@ -13,7 +13,7 @@ toc:
 
 # What is system calls and why do we need them
 
-System calls are the *interface* exposed by the Kernel for communication between the user programs and certain Kernel services. Such services include but are not limited to time, file, network, which are critical for implementing program functionalities. These services are shared among all programs across the whole system. System calls exist because they should be used *safely*, especially in a potentially malicious environment. Contamination of them could lead to the fall of the whole system. 
+System calls are the *interface* exposed by the Kernel for communication between the user programs and certain Kernel services. Such services include but are not limited to time, file, network, which are the underlying infrastructure for user programs and are essential to all programs in the whole system. System calls exist because of two main reasons: (a) the user program *relies on* these Kernel services for correct execution, and (b) these services should be used *safely*, especially in a potentially malicious environment. Contamination of them could lead to the fall of the whole system. 
 
 To understand why we need system calls, let’s take a closer look into time subsystem. The best example to demonstrate why clock should be properly protected is probably Evil Under the Sun by Agatha Christie (highly recommended but I’m not spoiling anything). The clock in computer is protected by the Kernel to provide any malicious program from overwriting the time and jeopardize the correct execution of other programs. Therefore, the only way a program can know about the time is by asking the Kernel to read the clock for it. And that is when system calls take place, posting the clock reading request to the Kernel and returning the time back to the program.
 
