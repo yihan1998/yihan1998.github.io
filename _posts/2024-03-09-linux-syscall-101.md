@@ -31,6 +31,7 @@ I always explain how system calls work to people as trying to order food in a fo
 
 This is basically what happens when a program tries to invoke a system call, where the program is the nervous customer, the Kernel is the waiter, and the system call table is the menu with numbers on items.
 
+```mermaid
 sequenceDiagram
     box Userspace
     participant User
@@ -52,6 +53,7 @@ sequenceDiagram
     Syscall Entry-->Syscall Entry: Restore context
     Syscall Entry->>-Libc: Return
     Libc->>-User: Return the number of read out data or -1
+```
 
 # Want to know more about how system calls are implemented?
 
