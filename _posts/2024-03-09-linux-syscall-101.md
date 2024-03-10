@@ -7,6 +7,9 @@ tags: Linux
 categories: sample-posts
 toc:
   sidebar: left
+mermaid:
+  enabled: true
+  zoomable: true
 ---
 
 # TL;DR
