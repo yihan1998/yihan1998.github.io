@@ -13,7 +13,13 @@ toc:
 
 # What are system calls and why do we need them
 
-System calls are the interface exposed by the Kernel for communication between the user programs and certain Kernel services. 
+System calls are the interface exposed by the Kernel for communication between the user programs and certain Kernel services. These services include but not limited to time, file, and network. They are implemented within the Kernel for reliability, portability, and security. 
+
+* Reliability
+
+* Portability
+
+* Security 
 
 The fundamental reason of having system calls is that programs running in the user mode need to leverage these services which require higher level of priviledge. 
 
