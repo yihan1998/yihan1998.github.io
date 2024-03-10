@@ -31,16 +31,27 @@ I always explain how system calls work to people as trying to order food in a fo
 
 This is basically what happens when a program tries to invoke a system call, where the program is the nervous customer, the Kernel is the waiter, and the system call table is the menu with numbers on items.
 
-```mermaid
 sequenceDiagram
+    box Userspace
     participant User
-    participant Kernel
-    User->>Kernel: Hello Kernel, may I have syscall #1?
-    loop Execute
-        Kernel->>Kernel: Perform syscall #1
+    participant Libc
     end
-    Kernel-->>User: Syscall #1 succeeded!
-```
+    box grey Kernelspace
+    participant Syscall Entry
+    participant do_syscall
+    participant do_sys_read
+    end
+    User->>+Libc: I want to read() from a socket
+    Libc->>+Syscall Entry: Invoke syscall #1
+    Syscall Entry-->Syscall Entry: Save context
+    Syscall Entry->>+do_syscall: Look up the function pointer in syscall table
+    do_syscall->>+do_sys_read: Invoke registered function
+    do_sys_read-->do_sys_read: Try to read out data from socket buffer
+    do_sys_read->>-do_syscall: Return the number of read out bytes 
+    do_syscall->>-Syscall Entry: Return
+    Syscall Entry-->Syscall Entry: Restore context
+    Syscall Entry->>-Libc: Return
+    Libc->>-User: Return the number of read out data or -1
 
 # Want to know more about how system calls are implemented?
 
