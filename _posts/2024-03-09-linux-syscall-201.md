@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Syscall 201: The Lifecycle of System Calls in Linux"
+title: "Syscall 201: The Lifecycle of System Calls in Operaing System"
 date: 2024-03-09 11:14:00-0400
-description: How does Linux Kernel actually implement system calls?
+description: How are system calls handled by the OS?
 tags: Linux
 categories: sample-posts
 toc:
@@ -19,7 +19,7 @@ In this article, we are getting a general overview of the life cycle of system c
 | Syscall table  |  An array of system calls where the location of syscall functions are stored  |
 | Syscall number | The offset used to look up the corresponding syscall in the system call table |
 
-# Before the Kernel Even Exists
+# The Journey before the Kernel even exists
 
 ## Define a System Call Function
 
@@ -31,14 +31,14 @@ The system call table is a globally shared variable inside the Kernel. Therefore
 
 In the actual Kernel, there could be hundreds of system calls and manually filling the table is obviously both unrealistic and not extendable. If you want to know more about the initialization trick here, do check out the following articles of system calls.
 
-# Triggering a System Call
+# Call of the adventure: triggering a system call
 
 Typically, there are two ways to invoke a system call — though this is not exactly accurate because they are fundamentally the same — direct invocation by specifying the system call number and trapping straight into the Kernel, while indirect invocation by using certain library function which does the former invocation on your behalf.
 
 It is worth noticing that system calls are one of the few ways that incur mode switch between the user and kernel space. The others are interrupt (e.g., from keyboard) and exception (e.g., dividing by 0), which we will cover in other chapters. The exact instruction that cause mode switching in system call differs from underlying instruction set architecture. For those who have learned assembly before, you might come across the instruction `int 0x80`. This is commonly used in `x86` architecture to invoke a system call. While in `x86_64`, such role is replaced by a faster`syscall` instruction.
 
-# Switching from User Mode to Kernel Mode
+# Dive into the Kernel world
 
-# Executing the System Call
+# Execute the system call
 
-# Returning the Result to the Caller
+# Return back to the userspace
