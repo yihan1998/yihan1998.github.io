@@ -59,7 +59,7 @@ __SYSCALL_64(3, __x64_sys_close, )
 
 For the sake of simplicity, I only show the what will be compiled on `x86_64`.
 
-## Why does `/arch/x86/include/generated` seem to be a weird path?
+## Why does `/arch/x86/include/generated` look weird?
 
 My first impression when I looked at this path is: how could someone name the folder to be `generated`? But the answer is somewhat unsurprising: because this folder **is** generated! But how, why, and by whom?
 
