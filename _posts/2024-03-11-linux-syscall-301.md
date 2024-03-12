@@ -6,7 +6,7 @@ description: How does Linux actually implement systems calls?
 tags: Linux
 categories: sample-posts
 toc:
-  sidebar: left
+  beginning: true
 featured: true
 ---
 
