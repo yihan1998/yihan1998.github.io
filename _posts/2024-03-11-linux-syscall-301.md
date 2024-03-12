@@ -7,9 +7,7 @@ tags: Linux
 categories: sample-posts
 toc:
   sidebar: left
-mermaid:
-  enabled: true
-  zoomable: true
+featured: true
 ---
 
 In this artical, we are taking a deep dive into the system call mechanism in Linux Kernel 5.4 running on `x86_64` architecture.
@@ -39,7 +37,14 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 #undef __SYSCALL_64
 ```
 
-Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`. In short, the first `__SYSCALL_64` generates the declaration of every syscall function, and the second `__SYSCALL_64` loads the address syscall function into the `sys_call_table` array, using their syscall number as the index within the syscall table.
+Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`. 
+
+> ##### TL;DR 
+>
+> The first `__SYSCALL_64` generates the declaration of every syscall function.
+> 
+> The second `__SYSCALL_64` loads the address syscall function into the `sys_call_table` array, using their syscall number as the index within the syscall table.
+{: .block-tip }
 
 Such a creative way of using the feature of C during the compiling phase! Now let's follow the compiler to see how on earth does it set up the whole syscall table for us.
 
