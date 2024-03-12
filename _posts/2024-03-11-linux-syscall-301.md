@@ -18,7 +18,7 @@ The Linux Kernel utilizes a lot of tricks in C in an impressive way and the sysc
 
 The definition of syscall table -- also known as `sys_call_table` -- locates in `/arch/x86/entry/syscall_64.c` and is an array of function pointers. Below is the source code that performs syscall table setup:
 
-```C
+```c
 #define __SYSCALL_64(nr, sym, qual) extern asmlinkage long sym(const struct pt_regs *);
 #include <asm/syscalls_64.h>
 #undef __SYSCALL_64
@@ -26,10 +26,6 @@ The definition of syscall table -- also known as `sys_call_table` -- locates in 
 #define __SYSCALL_64(nr, sym, qual) [nr] = sym,
 
 asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
-	/*
-	 * Smells like a compiler bug -- it doesn't work
-	 * when the & below is removed.
-	 */
 	[0 ... __NR_syscall_max] = &__x64_sys_ni_syscall,
 #include <asm/syscalls_64.h>
 };
@@ -39,18 +35,21 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 
 Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`. 
 
-> ##### TL;DR 
->
-> The first `__SYSCALL_64` generates the declaration of every syscall function.
+> The first `__SYSCALL_64` generates the declaration of every syscall handler.
 > 
-> The second `__SYSCALL_64` loads the address syscall function into the `sys_call_table` array, using their syscall number as the index within the syscall table.
-{: .block-tip }
+> The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table` array, using their syscall number as the index within the syscall table.
 
-Such a creative way of using the feature of C during the compiling phase! Now let's follow the compiler to see how on earth does it set up the whole syscall table for us.
+Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
 
-When I saw this header for the first time, I was shocked and confused: how and why does `<asm/syscalls_64.h>` get included twice yet expanded into two different pieces of codes? To understand why, we need to look into the content of this header, which locates under `/arcg/x86/include/generated/asm/syscalls_64.h`. Below is a clip of it:
+Now, if you are still curious about what is in this header, and how it is loaded when included, fasten your seat belt because we are going follow the preprocessor to see how miracle is performed. Allons-y!
 
-```C
+## What is in `<asm/syscalls_64.h>`?
+
+When I saw the above syscall initialization for the first time, I was shocked and confused: how and why does `<asm/syscalls_64.h>` get included here twice yet expanded into two different pieces of codes? 
+
+To understand why, we need to look into the content of this header, which locates under `/arch/x86/include/generated/asm/syscalls_64.h`. Below is a clip of it:
+
+```c
 __SYSCALL_64(0, __x64_sys_read, )
 __SYSCALL_64(1, __x64_sys_write, )
 __SYSCALL_64(2, __x64_sys_open, )
@@ -60,7 +59,11 @@ __SYSCALL_64(3, __x64_sys_close, )
 
 For the sake of simplicity, I only show the what will be compiled on `x86_64`.
 
-```Makefile
+## Why does `/arch/x86/include/generated` seem to be a weird path?
+
+My first impression when I looked at this path is: how could someone name the folder to be `generated`? But the answer is somewhat unsurprising: because this folder **is** generated! But how, why, and by whom?
+
+```makefile
 out := arch/$(SRCARCH)/include/generated/asm
 
 syscall64 := $(srctree)/$(src)/syscall_64.tbl
