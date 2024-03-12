@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'Syscall 301: Closer look into'
+title: "Syscall 301: Closer look into"
 date: 2024-03-09 11:14:00-0400
 description: How does the operating system actually implement system calls?
 tags: Linux
@@ -29,7 +29,7 @@ sequenceDiagram
     Syscall Entry->>+do_syscall: Look up the function pointer in syscall table
     do_syscall->>+do_sys_read: Invoke registered function
     do_sys_read-->do_sys_read: Try to read out data from socket buffer
-    do_sys_read->>-do_syscall: Return the number of read out bytes 
+    do_sys_read->>-do_syscall: Return the number of read out bytes
     do_syscall->>-Syscall Entry: Return
     Syscall Entry-->Syscall Entry: Restore context
     Syscall Entry->>-Libc: Return

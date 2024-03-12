@@ -33,31 +33,28 @@
       "studyType": "Bachelor",
       "startDate": "2016-09-01",
       "endDate": "2020-07-01",
-      "courses": ["Linear Algebra","Calculus","Probability and Mathematical Statistics",
-                  "Combinatorics","Data Structures","Introduction to Theory of Computation",
-                  "Computer Architecture","Operating System"]
+      "courses": [
+        "Linear Algebra",
+        "Calculus",
+        "Probability and Mathematical Statistics",
+        "Combinatorics",
+        "Data Structures",
+        "Introduction to Theory of Computation",
+        "Computer Architecture",
+        "Operating System"
+      ]
     }
   ],
   "skills": [
     {
       "name": "Programming language",
       "icon": "fa-solid fa-hashtag",
-      "keywords": [
-        "C - Advanced",
-        "Assembly - Advanced",
-        "Verilog - Intermediate",
-        "Go - Beginner",
-        "Rust - Beginner"
-      ]
+      "keywords": ["C - Advanced", "Assembly - Advanced", "Verilog - Intermediate", "Go - Beginner", "Rust - Beginner"]
     },
     {
       "name": "Techniques",
       "icon": "fa-solid fa-hashtag",
-      "keywords": [
-        "Fluent GDB user",
-        "Kernel module fabricator",
-        "LD_PRELOAD whisperer"
-      ]
+      "keywords": ["Fluent GDB user", "Kernel module fabricator", "LD_PRELOAD whisperer"]
     }
   ],
   "languages": [
@@ -76,17 +73,12 @@
     {
       "name": "Operating System",
       "icon": "fa-solid fa-tag",
-      "keywords": [
-        "Kernel",
-        "Scheduling"
-      ]
+      "keywords": ["Kernel", "Scheduling"]
     },
     {
       "name": "New Generation Hardware",
       "icon": "fa-solid fa-tag",
-      "keywords": [
-        "SmartNIC"
-      ]
+      "keywords": ["SmartNIC"]
     }
   ]
 }

@@ -11,4 +11,4 @@ toc:
   sidebar: left
 ---
 
-# What is WebAssembly (WASM)? 
+# What is WebAssembly (WASM)?

@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 'Cygnus'
-description: 
+title: "Cygnus"
+description:
 img: assets/img/12.jpg
 importance: 1
 category: Research
