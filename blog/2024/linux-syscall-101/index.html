@@ -14,7 +14,7 @@
     Syscall Entry-&gt;&gt;+do_syscall: Look up the function pointer in syscall table
     do_syscall-&gt;&gt;+do_sys_read: Invoke registered function
     do_sys_read--&gt;do_sys_read: Try to read out data from socket buffer
-    do_sys_read-&gt;&gt;-do_syscall: Return the number of read out bytes 
+    do_sys_read-&gt;&gt;-do_syscall: Return the number of read out bytes
     do_syscall-&gt;&gt;-Syscall Entry: Return
     Syscall Entry--&gt;Syscall Entry: Restore context
     Syscall Entry-&gt;&gt;-Libc: Return
