@@ -16,7 +16,7 @@ In this artical, we are taking a deep dive into the system call mechanism in Lin
 
 The Linux Kernel utilizes a lot of tricks in C in an impressive way and the syscall table initilization is one of my favourite. It is a perfect example of how coding in C can be elegant, flexible, and creative.
 
-The definition of syscall table -- also known as `sys_call_table` -- locates in `/arch/x86/entry/syscall_64.c` and is an array of function pointers. Below is the source code that performs syscall table setup:
+The definition of syscall table -- also known as `sys_call_table` in the Linux Kernel -- locates in `/arch/x86/entry/syscall_64.c` and is an array of function pointers. Below is the source code that performs syscall table setup:
 
 ```c
 #define __SYSCALL_64(nr, sym, qual) extern asmlinkage long sym(const struct pt_regs *);
