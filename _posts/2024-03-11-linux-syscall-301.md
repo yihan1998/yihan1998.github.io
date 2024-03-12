@@ -37,7 +37,7 @@ Remember we talked about the how unrealistic to manually initialize the syscall 
 
 > The first `__SYSCALL_64` generates the declaration of every syscall handler.
 > 
-> The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table` array, using their syscall number as the index within the syscall table.
+> The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table`, using their syscall number as the index within the syscall table array.
 
 Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
 
