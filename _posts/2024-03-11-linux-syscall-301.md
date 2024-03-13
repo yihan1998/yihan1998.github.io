@@ -57,11 +57,32 @@ __SYSCALL_64(3, __x64_sys_close, )
 ...
 ```
 
-For the sake of simplicity, I only show the what will be compiled on `x86_64`.
+For the sake of simplicity, I only show the what will be compiled on `x86_64`. Let’s take `read` for an example to demonstrate the code expansion in `syscall_64.c`.
+
+```c
+#define __SYSCALL_64(nr, sym, qual) extern asmlinkage long sym(const struct pt_regs *);
+extern asmlinkage long __x86_sys_read(const struct pt_regs *);
+...
+#undef __SYSCALL_64
+
+#define __SYSCALL_64(nr, sym, qual) [nr] = sym,
+
+asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
+	[0 ... __NR_syscall_max] = &__x64_sys_ni_syscall,
+	[0] = __x86_sys_read,
+	...
+};
+
+#undef __SYSCALL_64
+```
+
+As shown above, the first `__SYSCALL_64` expands the header into the declaration of syscall handlers, which will later be used to locate the handler entry during syscall table lookup. Notably, before expanding the second `__SYSCALL_64`, the Kernel first initializes all syscall handler to be `__x64_sys_ni_syscall `, just in case any unsupported syscall number triggers a segmentation fault and blow up the whole Kernel. After this, the second `__SYSCALL_64` associates the syscall handler with its syscall number in the table. In this way, the Kernel implements a general setup of syscall table, independent from the varied syscall mapping on different hardware platforms.
 
 ## Why does `/arch/x86/include/generated` seem weird?
 
-My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may _not_ surprise you: because this folder **is** generated! But how, why, and by whom?
+My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may _not_ surprise you: because this folder **is** generated! But how, why, and by whom? 
+
+With a simple searching in the repository, we can easily locate the creator of the `generated/` folder — the `Makefile` under `/arch/x86/syscalls/`. Below is the part of it that is associated with the generation of syscall related files.
 
 ```makefile
 out := arch/$(SRCARCH)/include/generated/asm
@@ -73,3 +94,5 @@ systbl := $(srctree)/$(src)/syscalltbl.sh
 $(out)/syscalls_64.h: $(syscall64) $(systbl)
 	$(call if_changed,systbl)
 ```
+
+Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. 
