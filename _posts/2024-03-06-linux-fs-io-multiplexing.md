@@ -11,12 +11,12 @@ toc:
 
 # TL;DR
 
-| Mechanism |                            In a Nutshell                             |                                                                      Use Cases                                                                      |
-| :-------- | :------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
-| `Select`  |                    :crown: OG of I/O multiplexing                    |                                                     Multiplexing for a small set of connections                                                     |
-| `Poll`    | :raised_hand: I'm like you but with flexible set of file descriptors |                                                          Multiplexing for more connections                                                          |
-| `Epoll`   |          :raised_hands: I'm like you two but more scalable           |                            Commonly used in high-performace server applications when there are thousands of connections                             |
-| `Eventfd` |             :v:Here to provide lightweight notification              | Lightweight synchronization between threads. Can be combined with `epoll` to achieve asynchronous event notification in multi-threaded environment. |
+| Mechanism |                            In a Nutshell                             |                                                                     Use Cases                                                                      |
+| :-------: | :------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------: |
+| `Select`  |                    :crown: OG of I/O multiplexing                    |                                                        To handle a small set of connections                                                        |
+|  `Poll`   | :raised_hand: I'm like you but with flexible set of file descriptors |                                                             To handle more connections                                                             |
+|  `Epoll`  |          :raised_hands: I'm like you two but more scalable           |                            Commonly used in high-performace server applications when there are thousands of connections                            |
+| `Eventfd` |             :v:Here to provide lightweight notification              | Lightweight synchronization between threads. Can be combined with `epoll` to achieve asynchronous event notification in multi-threaded envirnment. |
 
 # What is I/O ultiplexing and why do we need it
 

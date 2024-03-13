@@ -33,10 +33,10 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 #undef __SYSCALL_64
 ```
 
-Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`. 
+Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`.
 
 > The first `__SYSCALL_64` generates the declaration of every syscall handler.
-> 
+>
 > The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table`, using their syscall number as the index within the syscall table array.
 
 Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
@@ -45,7 +45,7 @@ Now, if you are still curious about what is in this header, and how it is loaded
 
 ## What is in `<asm/syscalls_64.h>`?
 
-When I saw the above syscall initialization for the first time, I was shocked and confused: how and why does `<asm/syscalls_64.h>` get included here twice yet expanded into two different pieces of codes? 
+When I saw the above syscall initialization for the first time, I was shocked and confused: how and why does `<asm/syscalls_64.h>` get included here twice yet expanded into two different pieces of codes?
 
 To understand why, we need to look into the content of this header, which locates under `/arch/x86/include/generated/asm/syscalls_64.h`. Below is a clip of it:
 
@@ -61,7 +61,7 @@ For the sake of simplicity, I only show the what will be compiled on `x86_64`.
 
 ## Why does `/arch/x86/include/generated` seem weird?
 
-My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may *not* surprise you: because this folder **is** generated! But how, why, and by whom?
+My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may _not_ surprise you: because this folder **is** generated! But how, why, and by whom?
 
 ```makefile
 out := arch/$(SRCARCH)/include/generated/asm
@@ -73,4 +73,3 @@ systbl := $(srctree)/$(src)/syscalltbl.sh
 $(out)/syscalls_64.h: $(syscall64) $(systbl)
 	$(call if_changed,systbl)
 ```
-
