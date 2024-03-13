@@ -95,4 +95,22 @@ $(out)/syscalls_64.h: $(syscall64) $(systbl)
 	$(call if_changed,systbl)
 ```
 
-Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. 
+Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. Now let’s see how syscall numbers and syscall handler are mapped in `syscall_64.tbl`:
+
+```sh
+# The format is:
+# <number> <abi> <name> <entry point>
+# The abi is "common", "64", or "x32" for this file
+0	common	read		__x64_sys_read
+1	common	write	__x64_sys_write
+2	common	open		__x64_sys_open
+3	common	close	__x64_sys_close
+...
+19	64		readv	__x64_sys_readv
+20	64		writev	__x64_sys_writev
+...
+512	x32		readv	__x32_compat_sys_readv
+513	x32		writev	__x32_compat_sys_writev
+...
+```
+## 
