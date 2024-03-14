@@ -11,7 +11,7 @@ toc:
 
 In this article, we are getting a general overview of the life cycle of system calls — how they are defined, declared, organized, and more importantly, invoked inside the Kernel.
 
-# Quick Recap on Syscall
+# Quick recap on terminologies
 
 |     Terms      |                                 In a Nutshell                                 |
 | :------------: | :---------------------------------------------------------------------------: |
@@ -19,13 +19,13 @@ In this article, we are getting a general overview of the life cycle of system c
 | Syscall table  |  An array of system calls where the location of syscall functions are stored  |
 | Syscall number | The offset used to look up the corresponding syscall in the system call table |
 
-# The Journey before the Kernel even exists
+# The journey before the Kernel even exists
 
-## Define a System Call Function
+## Define a system call handler
 
 In Linux Kernel, every system call function is defined via a macro called `SYSCALL_DEFINEx`, where `x` stands for the number of arguments this system call function takes. We shall take a closer look at this macro in the next blog.
 
-## Establishment of System Call Table
+## Establishment of system call table
 
 The system call table is a globally shared variable inside the Kernel. Therefore, every system call made by any process is actually accessing the same memory region where the table is stored. In short, the system call table is an array of function pointers, where the index indicates the system call number of the corresponding syscall function.
 
