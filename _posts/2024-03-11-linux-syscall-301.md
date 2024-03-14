@@ -118,4 +118,4 @@ Now let’s see how syscall numbers and syscall handler are mapped in `syscall_6
 ...
 ```
 
-We can easily see from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also distinguish their type based on the prefix of the handler entry. 
+It's clear from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also easily distinguish their type based on the prefix of the handler entry. 
