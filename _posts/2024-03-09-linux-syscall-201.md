@@ -2,7 +2,7 @@
 layout: post
 title: "Syscall 201: The Lifecycle of System Calls in Operaing System"
 date: 2024-03-09 11:14:00-0400
-description: How are system calls handled by the OS?
+description: Initialization, invocation, and execution of system calls
 tags: Linux
 categories: sample-posts
 toc:

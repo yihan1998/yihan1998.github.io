@@ -9,14 +9,17 @@ toc:
   sidebar: left
 mermaid:
   enabled: true
-  zoomable: true
 ---
+
+In this chapter, we are introducing the basic concept of system calls.
 
 # TL;DR
 
+System calls serve as an interface between the user space and the kernel space, allowing user-level applications to request services from the Linux kernel. 
+
 # What are system calls and why do we need them
 
-System calls are the interface exposed by the Kernel for communication between the user programs and certain Kernel services. These services include but not limited to time, file, and network. They are implemented within the Kernel mainly due to the following reasons:
+System calls are the interfaces exposed by the Kernel for communication between the user programs and certain Kernel services. These services include but not limited to time, file, and network. They are implemented within the Kernel mainly due to the following reasons:
 
 - **Reliability**: If you are an advanced system hacker, you may know tricks that allow you to design file system or network stack completely within the userspace. But for regular program developers, it is easier to rely on the trustworthy Kernel to provide these services. For example, the Kernel ensures that when the program attemps to read out something by calling read() on a TCP socket, it shall receive in sequence data if there is any. The correctness is guaranteed by the network system within the Kernel.
 

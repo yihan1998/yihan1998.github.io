@@ -1,16 +1,15 @@
 ---
 layout: post
-title: "Syscall 301: A Deep Dive into the Syscall Mechanism in Linux Kernel"
+title: "Syscall 301: A Deep Dive into the System Calls in Linux Kernel"
 date: 2024-03-09 11:14:00-0400
-description: How does Linux actually implement systems calls?
+description: Highly detailed walkthrough of system call mechanism
 tags: Linux
 categories: sample-posts
 toc:
   beginning: true
-featured: true
 ---
 
-In this artical, we are taking a deep dive into the system call mechanism in Linux Kernel 5.4 running on `x86_64` architecture.
+In this artical, we are taking a deep dive into the system calls in Linux Kernel 5.4 on an `x86_64` architecture.
 
 # Setting up the syscall table
 
