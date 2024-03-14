@@ -18,7 +18,7 @@ toc:
 |  `Epoll`  |          :raised_hands: I'm like you two but more scalable           |                            Commonly used in high-performace server applications when there are thousands of connections                            |
 | `Eventfd` |             :v:Here to provide lightweight notification              | Lightweight synchronization between threads. Can be combined with `epoll` to achieve asynchronous event notification in multi-threaded envirnment. |
 
-# What is I/O ultiplexing and why do we need it
+# What is I/O multiplexing and why do we need it
 
 # `Select`: OG of I/O Multiplexing
 
