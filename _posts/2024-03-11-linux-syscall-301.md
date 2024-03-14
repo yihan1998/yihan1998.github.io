@@ -57,7 +57,9 @@ __SYSCALL_64(3, __x64_sys_close, )
 ...
 ```
 
-For the sake of simplicity, I only show the what will be compiled on `x86_64`. Let’s take `read` for an example to demonstrate the code expansion in `syscall_64.c`.
+For the sake of simplicity, I only show the what will be left after the preprocessing phase on the `x86_64` architecture. In the actual header, the Kernel uses other `#ifdef` directive to support more flexible Kernel configuration during preprocessing.
+
+To make things easier to understand, let’s take `read` for an example to see how the two different `__SYSCALL_64` macros expand the above mappings separatedly.
 
 ```c
 #define __SYSCALL_64(nr, sym, qual) extern asmlinkage long sym(const struct pt_regs *);
@@ -95,7 +97,9 @@ $(out)/syscalls_64.h: $(syscall64) $(systbl)
 	$(call if_changed,systbl)
 ```
 
-Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. Now let’s see how syscall numbers and syscall handler are mapped in `syscall_64.tbl`:
+Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. How the bash script work is too detailed for this article, but in one sentence, it maps every single syscall number to its handler entry in a format of `__SYSCALL_64/X32(*index*, *handler_entry*)` in `syscalls_64.h`.  The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. In fact, this is a universal approach for every hardware architecture that supports the Linux Kernel to automatically create the syscall header. If you look into the source code of version 5.4, there is some `Makefile` in each subfolder under `/arch/` that serves the same purpose like the commands above.
+
+Now let’s see how syscall numbers and syscall handler are mapped in `syscall_64.tbl`:
 
 ```sh
 # The format is:
@@ -113,4 +117,5 @@ Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` a
 513	x32		writev	__x32_compat_sys_writev
 ...
 ```
-## 
+
+We can easily see from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also distinguish their type based on the prefix of the handler entry. 
