@@ -11,7 +11,7 @@ toc:
 
 In this artical, we are taking a deep dive into the system calls in Linux Kernel 5.4 on an `x86_64` architecture.
 
-# Setting up the syscall table
+# Set up the syscall table
 
 The Linux Kernel utilizes a lot of tricks in C in an impressive way and the syscall table initilization is one of my favourite. It is a perfect example of how coding in C can be elegant, flexible, and creative.
 
@@ -118,3 +118,121 @@ Now let’s see how syscall numbers and syscall handler are mapped in `syscall_6
 ```
 
 It's clear from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also easily distinguish their type based on the prefix of the handler entry. 
+
+# Define a system call handler
+
+If you try to search for the syscall handler we've mentioned above (e.g., `__x64_sys_read`), you might be confused when you fail to see any function with that name in the Kernel source code. Why and how could it be possible? The answer lies in another header file -- `/include/linux/syscalls.h` -- and we are about to be amazed by the wisdom of system designers again.
+
+## How to deal with different number of syscall arguments? 
+
+If we go back to the definition of syscall table, we shall find that it is defined as an array of `sys_call_ptr_t`, which based on its name, we know it should be a function pointer pointing to syscall handler. It is defined in `/arch/x86/include/asm/syscall.h` as follows:
+
+```c
+typedef asmlinkage long (*sys_call_ptr_t)(const struct pt_regs *);
+```
+
+### From `struct pt_regs` to argument list
+
+```c
+/*
+ * Instead of the generic __SYSCALL_DEFINEx() definition, this macro takes
+ * struct pt_regs *regs as the only argument of the syscall stub named
+ * __x64_sys_*(). It decodes just the registers it needs and passes them on to
+ * the __se_sys_*() wrapper performing sign extension and then to the
+ * __do_sys_*() function doing the actual job. These wrappers and functions
+ * are inlined (at least in very most cases), meaning that the assembly looks
+ * as follows (slightly re-ordered for better readability):
+ *
+ * <__x64_sys_recv>:		<-- syscall with 4 parameters
+ *	callq	<__fentry__>
+ *
+ *	mov	0x70(%rdi),%rdi	<-- decode regs->di
+ *	mov	0x68(%rdi),%rsi	<-- decode regs->si
+ *	mov	0x60(%rdi),%rdx	<-- decode regs->dx
+ *	mov	0x38(%rdi),%rcx	<-- decode regs->r10
+ *
+ *	xor	%r9d,%r9d	<-- clear %r9
+ *	xor	%r8d,%r8d	<-- clear %r8
+ *
+ *	callq	__sys_recvfrom	<-- do the actual work in __sys_recvfrom()
+ *				    which takes 6 arguments
+ *
+ *	cltq			<-- extend return value to 64-bit
+ *	retq			<-- return
+ *
+ * This approach avoids leaking random user-provided register content down
+ * the call chain.
+ */
+#define __SYSCALL_DEFINEx(x, name, ...)					\
+	asmlinkage long __x64_sys##name(const struct pt_regs *regs);	\
+	static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__));	\
+	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__));\
+	asmlinkage long __x64_sys##name(const struct pt_regs *regs)	\
+	{								\
+		return __se_sys##name(SC_X86_64_REGS_TO_ARGS(x,__VA_ARGS__));\
+	}								\
+	static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))	\
+	{								\
+		long ret = __do_sys##name(__MAP(x,__SC_CAST,__VA_ARGS__));\
+		__MAP(x,__SC_TEST,__VA_ARGS__);				\
+		return ret;						\
+	}								\
+	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
+```
+
+```c
+/*
+ * As the generic SYSCALL_DEFINE0() macro does not decode any parameters for
+ * obvious reasons, and passing struct pt_regs *regs to it in %rdi does not
+ * hurt, we only need to re-define it here to keep the naming congruent to
+ * SYSCALL_DEFINEx() -- which is essential for the COND_SYSCALL() and SYS_NI()
+ * macros to work correctly.
+ */
+#ifndef SYSCALL_DEFINE0
+#define SYSCALL_DEFINE0(sname)						\
+	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused);\
+	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused)
+#endif
+```
+
+```c
+#define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE2(name, ...) SYSCALL_DEFINEx(2, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE3(name, ...) SYSCALL_DEFINEx(3, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE4(name, ...) SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE5(name, ...) SYSCALL_DEFINEx(5, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
+
+#define SYSCALL_DEFINE_MAXARGS	6
+
+#define SYSCALL_DEFINEx(x, sname, ...)				\
+	__SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
+```
+
+```c
+/*
+ * __MAP - apply a macro to syscall arguments
+ * __MAP(n, m, t1, a1, t2, a2, ..., tn, an) will expand to
+ *    m(t1, a1), m(t2, a2), ..., m(tn, an)
+ * The first argument must be equal to the amount of type/name
+ * pairs given.  Note that this list of pairs (i.e. the arguments
+ * of __MAP starting at the third one) is in the same format as
+ * for SYSCALL_DEFINE<n>/COMPAT_SYSCALL_DEFINE<n>
+ */
+#define __MAP0(m,...)
+#define __MAP1(m,t,a,...) m(t,a)
+#define __MAP2(m,t,a,...) m(t,a), __MAP1(m,__VA_ARGS__)
+#define __MAP3(m,t,a,...) m(t,a), __MAP2(m,__VA_ARGS__)
+#define __MAP4(m,t,a,...) m(t,a), __MAP3(m,__VA_ARGS__)
+#define __MAP5(m,t,a,...) m(t,a), __MAP4(m,__VA_ARGS__)
+#define __MAP6(m,t,a,...) m(t,a), __MAP5(m,__VA_ARGS__)
+#define __MAP(n,...) __MAP##n(__VA_ARGS__)
+```
+
+```c
+/* Mapping of registers to parameters for syscalls on x86-64 and x32 */
+#define SC_X86_64_REGS_TO_ARGS(x, ...)					\
+	__MAP(x,__SC_ARGS						\
+		,,regs->di,,regs->si,,regs->dx				\
+		,,regs->r10,,regs->r8,,regs->r9)			\
+```
