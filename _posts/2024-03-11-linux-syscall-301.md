@@ -35,7 +35,7 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`.
 
 > The first `__SYSCALL_64` generates the declaration of every syscall handler.
->
+> 
 > The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table`, using their syscall number as the index within the syscall table array.
 
 Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
@@ -144,6 +144,9 @@ Let's begin with `SYSCALL_DEFINE<#>` macro in `/include/linux/syscalls.h`. The p
 #define SYSCALL_DEFINE4(name, ...) SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
 #define SYSCALL_DEFINE5(name, ...) SYSCALL_DEFINEx(5, _##name, __VA_ARGS__)
 #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
+
+#define SYSCALL_DEFINEx(x, sname, ...)				\
+	__SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
 ```
 
 What worth noticing is the `SYSCALL_DEFINE0` macro, which might be defined differently across hardware architecture. On `x86_64`, it is defined in `/arch/x86/include/asm/syscall_wrapper.h` as follows:
@@ -162,14 +165,9 @@ What worth noticing is the `SYSCALL_DEFINE0` macro, which might be defined diffe
 #endif
 ```
 
-Now you might be wondering, what is the `SYSCALL_DEFINEx`?
+Now we have reached the end of syscalls that takes no argument (e.g., `fork` and `getpid`). But you might be wondering, why does `SYSCALL_DEFINE0` still take `const struct pt_regs *` as the arguments and how does `__SYSCALL_DEFINEx` unify the syscalls that take different number of arguments?
 
-```c
-#define SYSCALL_DEFINEx(x, sname, ...)				\
-	__SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
-```
-
-## How to deal with different number of syscall arguments? 
+## How to deal with different number of arguments? 
 
 If we go back to the definition of syscall table, we shall find that it is defined as an array of `sys_call_ptr_t`, which based on its name, we know it should be a function pointer pointing to syscall handler. It is defined in `/arch/x86/include/asm/syscall.h` as follows:
 
@@ -177,7 +175,11 @@ If we go back to the definition of syscall table, we shall find that it is defin
 typedef asmlinkage long (*sys_call_ptr_t)(const struct pt_regs *);
 ```
 
-### From `struct pt_regs` to argument list
+Each syscall handler should take `const struct pt_regs *` — which saves the register context — as the single argument and return a long variable. We have already seen that `SYSCALL_DEFINE0` fits this type definition, so let’s see how `__SYSCALL_DEFINEx` helps other syscalls fit into this format and perform the argument passing. 
+
+### Definition of syscall handler via `__SYSCALL_DEFINEx`
+
+Even though different syscalls may have varied number of arguments, they are all saved in the register context `struct pt_regs` during mode switch. Therefore, each syscall function has to recover their arguments from the saved context, and the Kernel achieves this via the uniformed syscall definition `__SYSCALL_DEFINEx`. On `x86_64`, `__SYSCALL_DEFINEx` is defined in `/arch/x86/include/asm/syscall_wrapper.h` as follows:
 
 ```c
 /*
@@ -226,6 +228,14 @@ typedef asmlinkage long (*sys_call_ptr_t)(const struct pt_regs *);
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 ```
 
+In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. 
+
+Let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`.  
+
+### Definition of argument lists via `__MAP`
+
+Now let’s see how `__MAP` macro deals with handler arguments. The definition is within `/include/linux/syscalls.h` as follows:
+
 ```c
 /*
  * __MAP - apply a macro to syscall arguments
@@ -245,6 +255,8 @@ typedef asmlinkage long (*sys_call_ptr_t)(const struct pt_regs *);
 #define __MAP6(m,t,a,...) m(t,a), __MAP5(m,__VA_ARGS__)
 #define __MAP(n,...) __MAP##n(__VA_ARGS__)
 ```
+
+`__MAP<#>` series is a recursive definition. 
 
 ```c
 /* Mapping of registers to parameters for syscalls on x86-64 and x32 */
