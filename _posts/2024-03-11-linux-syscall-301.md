@@ -228,7 +228,7 @@ Even though different syscalls may have varied number of arguments, they are all
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 ```
 
-In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. But let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`. Now we will move on to the declaration and extraction of syscall arguments.
+In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. But let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`. Now we will move on to the more complicated process -- the declaration and extraction of syscall arguments.
 
 ### Definition of argument lists via `__MAP`
 
