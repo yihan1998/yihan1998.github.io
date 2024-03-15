@@ -123,6 +123,52 @@ It's clear from the clip above that this file supports three types of ABI: `comm
 
 If you try to search for the syscall handler we've mentioned above (e.g., `__x64_sys_read`), you might be confused when you fail to see any function with that name in the Kernel source code. Why and how could it be possible? The answer lies in another header file -- `/include/linux/syscalls.h` -- and we are about to be amazed by the wisdom of system designers again.
 
+## How is a syscall hander be defined?
+
+Let's take `read` as an exmaple again. The actual implementation locates in `/fs/read_write.c` and is defined as follows:
+
+```c
+SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
+```
+
+This doesn't seem like an ordinary defination of a function, so what is `SYSCALL_DEFINE3` macro and how does the Linux Kernel turn the above definition into `__x64_sys_read` in the syscall table? 
+
+Let's begin with `SYSCALL_DEFINE<#>` macro in `/include/linux/syscalls.h`. The purpose of this macro is to define a format of syscall handler within the Kernel. As we mentioned in the previous article, the `<#>` here stands for the number of arguments that this syscall handler takes. Although there is no restriction on the number of arguments for a C function, a caller on the `x86_64` architecture can use at most 6 registers for argument passing to the callee, which are `%rdi, %rsi, %rdx, %rcx, %r8, %r9` in left-to-right order. Therefore, the `<#>` in `SYSCALL_DEFINE<#>` macro ranges from 0 to 6 on `x86_64`. Here is the definition of the series of `SYSCALL_DEFINE<#>` macro:
+
+```c
+#define SYSCALL_DEFINE_MAXARGS	6
+
+#define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE2(name, ...) SYSCALL_DEFINEx(2, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE3(name, ...) SYSCALL_DEFINEx(3, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE4(name, ...) SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE5(name, ...) SYSCALL_DEFINEx(5, _##name, __VA_ARGS__)
+#define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
+```
+
+What worth noticing is the `SYSCALL_DEFINE0` macro, which might be defined differently across hardware architecture. On `x86_64`, it is defined in `/arch/x86/include/asm/syscall_wrapper.h` as follows:
+
+```c
+/*
+ * As the generic SYSCALL_DEFINE0() macro does not decode any parameters for
+ * obvious reasons, and passing struct pt_regs *regs to it in %rdi does not
+ * hurt, we only need to re-define it here to keep the naming congruent to
+ * SYSCALL_DEFINEx()
+ */
+#ifndef SYSCALL_DEFINE0
+#define SYSCALL_DEFINE0(sname)						\
+	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused);\
+	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused)
+#endif
+```
+
+Now you might be wondering, what is the `SYSCALL_DEFINEx`?
+
+```c
+#define SYSCALL_DEFINEx(x, sname, ...)				\
+	__SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
+```
+
 ## How to deal with different number of syscall arguments? 
 
 If we go back to the definition of syscall table, we shall find that it is defined as an array of `sys_call_ptr_t`, which based on its name, we know it should be a function pointer pointing to syscall handler. It is defined in `/arch/x86/include/asm/syscall.h` as follows:
@@ -178,35 +224,6 @@ typedef asmlinkage long (*sys_call_ptr_t)(const struct pt_regs *);
 		return ret;						\
 	}								\
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
-```
-
-```c
-/*
- * As the generic SYSCALL_DEFINE0() macro does not decode any parameters for
- * obvious reasons, and passing struct pt_regs *regs to it in %rdi does not
- * hurt, we only need to re-define it here to keep the naming congruent to
- * SYSCALL_DEFINEx() -- which is essential for the COND_SYSCALL() and SYS_NI()
- * macros to work correctly.
- */
-#ifndef SYSCALL_DEFINE0
-#define SYSCALL_DEFINE0(sname)						\
-	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused);\
-	asmlinkage long __x64_sys_##sname(const struct pt_regs *__unused)
-#endif
-```
-
-```c
-#define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
-#define SYSCALL_DEFINE2(name, ...) SYSCALL_DEFINEx(2, _##name, __VA_ARGS__)
-#define SYSCALL_DEFINE3(name, ...) SYSCALL_DEFINEx(3, _##name, __VA_ARGS__)
-#define SYSCALL_DEFINE4(name, ...) SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
-#define SYSCALL_DEFINE5(name, ...) SYSCALL_DEFINEx(5, _##name, __VA_ARGS__)
-#define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
-
-#define SYSCALL_DEFINE_MAXARGS	6
-
-#define SYSCALL_DEFINEx(x, sname, ...)				\
-	__SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
 ```
 
 ```c
