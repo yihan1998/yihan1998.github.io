@@ -23,7 +23,7 @@ In this article, we are getting a general overview of the life cycle of system c
 
 ## Define a system call handler
 
-In Linux Kernel, every system call function is defined via a macro called `SYSCALL_DEFINE<#>`, where `<#>` stands for the number of arguments this system call function takes. We shall take a closer look at this macro in the next blog.
+In Linux Kernel, every system call function is defined via a macro called `SYSCALL_DEFINE<n>`, where `<n>` stands for the number of arguments this system call function takes. We shall take a closer look at this macro in the next blog.
 
 ## Establishment of system call table
 

@@ -133,7 +133,7 @@ SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 
 This doesn't seem like an ordinary defination of a function, so what is `SYSCALL_DEFINE3` macro and how does the Linux Kernel turn the above definition into `__x64_sys_read` in the syscall table? 
 
-Let's begin with `SYSCALL_DEFINE<#>` macro in `/include/linux/syscalls.h`. The purpose of this macro is to define a format of syscall handler within the Kernel. As we mentioned in the previous article, the `<#>` here stands for the number of arguments that this syscall handler takes. Although there is no restriction on the number of arguments for a C function, a caller on the `x86_64` architecture can use at most 6 registers for argument passing to the callee, which are `%rdi, %rsi, %rdx, %rcx, %r8, %r9` in left-to-right order. Therefore, the `<#>` in `SYSCALL_DEFINE<#>` macro ranges from 0 to 6 on `x86_64`. Here is the definition of the series of `SYSCALL_DEFINE<#>` macro:
+Let's begin with `SYSCALL_DEFINE<n>` macro in `/include/linux/syscalls.h`. The purpose of this macro is to define a format of syscall handler within the Kernel. As we mentioned in the previous article, the `<n>` here stands for the number of arguments that this syscall handler takes. Although there is no restriction on the number of arguments for a C function, a caller on the `x86_64` architecture can use at most 6 registers for argument passing to the callee, which are `%rdi, %rsi, %rdx, %rcx, %r8, %r9` in left-to-right order. Therefore, the `<n>` in `SYSCALL_DEFINE<n>` macro ranges from 0 to 6 on `x86_64`. Here is the definition of the series of `SYSCALL_DEFINE<n>` macro:
 
 ```c
 #define SYSCALL_DEFINE_MAXARGS	6
@@ -228,9 +228,7 @@ Even though different syscalls may have varied number of arguments, they are all
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 ```
 
-In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. 
-
-Let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`.  
+In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. But let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`. Now we will move on to the declaration and extraction of syscall arguments.
 
 ### Definition of argument lists via `__MAP`
 
@@ -254,9 +252,21 @@ Now let’s see how `__MAP` macro deals with handler arguments. The definition i
 #define __MAP5(m,t,a,...) m(t,a), __MAP4(m,__VA_ARGS__)
 #define __MAP6(m,t,a,...) m(t,a), __MAP5(m,__VA_ARGS__)
 #define __MAP(n,...) __MAP##n(__VA_ARGS__)
+
+#define __SC_DECL(t, a)	t a
+#define __TYPE_AS(t, v)	__same_type((__force t)0, v)
+#define __TYPE_IS_L(t)	(__TYPE_AS(t, 0L))
+#define __TYPE_IS_UL(t)	(__TYPE_AS(t, 0UL))
+#define __TYPE_IS_LL(t) (__TYPE_AS(t, 0LL) || __TYPE_AS(t, 0ULL))
+#define __SC_LONG(t, a) __typeof(__builtin_choose_expr(__TYPE_IS_LL(t), 0LL, 0L)) a
+#define __SC_CAST(t, a)	(__force t) a
+#define __SC_TYPE(t, a)	t
+#define __SC_ARGS(t, a)	a
+#define __SC_TEST(t, a) (void)BUILD_BUG_ON_ZERO(!__TYPE_IS_LL(t) && sizeof(t) > sizeof(long))
+
 ```
 
-`__MAP<#>` series is a recursive definition. 
+`__MAP<n>` series is a recursive definition. 
 
 ```c
 /* Mapping of registers to parameters for syscalls on x86-64 and x32 */
