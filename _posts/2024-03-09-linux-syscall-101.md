@@ -18,7 +18,7 @@ In this chapter, we are introducing the basic concept of system calls.
 System calls serve as an interface between the user space and the kernel space, allowing user-level applications to request services from the Linux kernel. System calls are often fixed up with library function, here is a comparison between syscalls, library functions, and user-defined functions:
 
 | Mechanism             | In a Nutshell                                                | Characteristics                                              |
-|:---------------------:|:------------------------------------------------------------:|--------------------------------------------------------------|
+|:---------------------:|:------------------------------------------------------------:|:--------------------------------------------------------------:|
 | Syscall               | Interface that enable user space program to communicate with the Kernel | Indirectly invoked by the programmer<br>Implemented by the operating system <br>Require a mode switch from user space to Kernel space |
 | Library function      | Encapsulated code that enable easier use of certain functions | Directly used by the programmer<br>Implemented in user space<br>Often provided by third-party or the Kernel<br>Generalized for various applications<br>May act as wrappers around system calls, but doesn’t mean every library function invokes syscall |
 | User-defined function | Functions that developer creates to perform specific tasks in their application | Directly used by the programmer<br>Implemented in user space<br>Written by the user <br>Highly customized to serve the developer’s need |
@@ -60,5 +60,27 @@ sequenceDiagram
 
 ## General workflow
 
+Let’s use `read()` from `unistd.h` to demonstrate how developer uses library function to invoke the actual syscall.
+
+```mermaid
+sequenceDiagram
+    box User space
+    participant User
+    participant Libc
+    end
+    box Kernel space
+    participant Syscall entry
+    participant Read syscall
+    end
+    User->>+Libc: I want to read() from socket 
+    Libc->>+Syscall entry: Invoke syscall number of read
+    Syscall entry->>Syscall entry: Save register context
+    Syscall entry->>+Read syscall: Invoke read syscall
+    Read syscall->>Read syscall: Try to read from socket
+    Read syscall->>-Syscall entry: Return the number of bytes
+    Syscall entry->>Syscall entry: Restore register context 
+    Syscall entry->>-Libc: Return
+    Libc->>-User: Get the number of bytes read from socket
+```
 
 # Want to know more about how system calls are implemented?
