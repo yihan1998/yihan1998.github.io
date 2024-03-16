@@ -21,15 +21,13 @@ System calls serve as an interface between the user space and the kernel space, 
 
 System calls are the interfaces exposed by the Kernel for communication between the user programs and certain Kernel services. These services include but not limited to time, file, and network. They are implemented within the Kernel mainly due to the following reasons:
 
-- **Reliability**: If you are an advanced system hacker, you may know tricks that allow you to design file system or network stack completely within the userspace. But for regular program developers, it is easier to rely on the trustworthy Kernel to provide these services. For example, the Kernel ensures that when the program attemps to read out something by calling read() on a TCP socket, it shall receive in sequence data if there is any. The correctness is guaranteed by the network system within the Kernel.
+- **Efficiency and reliability**: The application developers only have to include specific headers to utilize certain functionalities (e.g., file operation, network communication). Developers don’t have to worry about the correctness or implementation details of these functions.
 
-- **Portability**: The portability here are referring to both that across different operating system and between different release verson of one system.
+- **Resource management**: Critical and shared resources (e.g., file table) may be shared among processes. Since the Kernel has the global view of all system resources, it would be easier to avoid contention and implement fair sharing between applications. 
 
-- **Security**: Since the services are provided by the monolithic Kernel and shared among all programs within the system, it is vital to protect the Kernel and benign applications from being contaminated by any destructive behaviours in a potentially malicious environment.
+- **Security**: These services are accessible by any process in the system. Yet malicious behavior may happen in the real world, intentionally or not. Therefore, it’s vital to protect these services from being contaminated and corrupt the whole operating system. 
 
-The fundamental reason of having system calls is that programs running in the user mode need to leverage these services which require higher level of priviledge.
-
-<!-- (a) These services are shared by all processes in the operating system and  The program running in user space need to leverage the services provided by the Kernel, and (b)  -->
+Now the question before us is: how should programs in the user space access these services that require Kernel privilege? This is where the system calls play their role: they act as the gate keeper, to make an entrance to the Kernel world and overwatch the invocation of the user program. Despite that different architectures may have varied sets of system calls, the workflow of system calls is universal and architecture-independent. Therefore, we are going to introduce how system call works from a general perspective.
 
 # How do system calls work
 
