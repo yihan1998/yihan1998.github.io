@@ -53,14 +53,13 @@ sequenceDiagram
     participant Kernel
 
     User->>+Kernel: I want to read() from a socket
-    Kernel->>Kernel: Try to read out bytes if there is any from the socket buffer
-    Kernel->>-User: Return the number of read out data or -1
+    Kernel->>Kernel: Try to read out data from the socket buffer
+    Kernel->>-User: Return the number of bytes
 ```
-
 
 ## General workflow
 
-Let’s use `read()` from `unistd.h` to demonstrate how developer uses library function to invoke the actual syscall.
+Let’s use `read()` from `unistd.h` to demonstrate how developer uses library function to invoke the underlying syscall. Here is a general summary of syscall workflow. 
 
 ```mermaid
 sequenceDiagram
@@ -72,7 +71,7 @@ sequenceDiagram
     participant Syscall entry
     participant Read syscall
     end
-    User->>+Libc: I want to read() from socket 
+    User->>+Libc: Call read() on socket 
     Libc->>+Syscall entry: Invoke syscall number of read
     Syscall entry->>Syscall entry: Save register context
     Syscall entry->>+Read syscall: Invoke read syscall
@@ -80,7 +79,8 @@ sequenceDiagram
     Read syscall->>-Syscall entry: Return the number of bytes
     Syscall entry->>Syscall entry: Restore register context 
     Syscall entry->>-Libc: Return
-    Libc->>-User: Get the number of bytes read from socket
+    Libc->>-User: Get the number of read out bytes
 ```
+
 
 # Want to know more about how system calls are implemented?
