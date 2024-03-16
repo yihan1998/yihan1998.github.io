@@ -22,9 +22,9 @@ In this article, we are going to introduce the basic concept of I/O multiplexing
 
 # What is I/O multiplexing and why do we need it
 
-Imagine you are a bartender. It's 3pm and the bar is quite empty right now. You are staring at the ceiling, totally bored and lost in your mind, when a man comes and asks for Irish Coffee. 
+Imagine you are a bartender. It's 3pm and the bar is quite empty right now. You are staring at the ceiling, totally bored and lost in your mind, when a man in hoodie comes and asks for Irish Coffee. So you start to brew a fresh cup of coffee when he begins to talk about how the recent economic depression hits the company he is working for. You blend one ounce of Irish whiskey into the hot coffee when he complains the shrank bonus making him harder to pay for the mortgage and the life expenses of his family. You pour a large spoon of heavy cream on top of the liquor and watch him swallow the liquid like if it’s the medicine to cure his life. He finishes with a long sigh and you gaze after him vanishing into the shadow of skyscrapers. Then you sink into your thoughts once again.
 
-As night falls and it's the happy hour time. The bar is getting busier and there is no time for you to doze off.
+As night falls the bar gets busier and there is no time for you to doze off. Looks like a traders from a nearby startup just close a big deal and they are celebrating with one round of tequila shot. You are busy cutting lemon wedges when a guy with a sullen look comes in and asks for the strongest drink — probably just went through a breakup. You fix him a Long Island and hope this may help him forget about the pain for tonight. Yet he bursts out crying and mumbling about how his girlfriend dumped him for another man. Your best comforting words are “I’m sure you have done all you can possibly do” and “you deserve better than this” because the trading guys asked for another round of margarita and you are too busy shaking the bottles. Eventually, the friends of the heartbroken guy come to pick him up and the traders leave for the next place in their drinking marathon. Finally you call it a night with exhausted mind and hurting wrists. 
 
 # `Select`: OG of I/O Multiplexing
 
