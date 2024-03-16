@@ -15,7 +15,7 @@ In this chapter, we are introducing the basic concept of system calls.
 
 # TL;DR
 
-System calls serve as an interface between the user space and the kernel space, allowing user-level applications to request services from the Linux kernel. 
+System calls serve as an interface between the user space and the kernel space, allowing user-level applications to request services from the Linux kernel.
 
 # What are system calls and why do we need them
 

@@ -35,7 +35,7 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`.
 
 > The first `__SYSCALL_64` generates the declaration of every syscall handler.
-> 
+>
 > The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table`, using their syscall number as the index within the syscall table array.
 
 Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
@@ -81,7 +81,7 @@ As shown above, the first `__SYSCALL_64` expands the header into the declaration
 
 ## Why does `/arch/x86/include/generated` seem weird?
 
-My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may _not_ surprise you: because this folder **is** generated! But how, why, and by whom? 
+My first impression when I looked at this path is: how could someone name the folder to be `generated`? The answer may _not_ surprise you: because this folder **is** generated! But how, why, and by whom?
 
 With a simple searching in the repository, we can easily locate the creator of the `generated/` folder — the `Makefile` under `/arch/x86/syscalls/`. Below is the part of it that is associated with the generation of syscall related files.
 
@@ -96,7 +96,7 @@ $(out)/syscalls_64.h: $(syscall64) $(systbl)
 	$(call if_changed,systbl)
 ```
 
-Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. How the bash script work is too detailed for this article, but in one sentence, it maps every single syscall number to its handler entry in a format of `__SYSCALL_64/X32(*index*, *handler_entry*)` in `syscalls_64.h`.  The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. In fact, this is a universal approach for every hardware architecture that supports the Linux Kernel to automatically create the syscall header. If you look into the source code of version 5.4, there is some `Makefile` in each subfolder under `/arch/` that serves the same purpose like the commands above.
+Basically, what it does is to call `syscalltbl.sh` that takes `syscall_64.tbl` as input and generates `syscalls_64.h`. How the bash script work is too detailed for this article, but in one sentence, it maps every single syscall number to its handler entry in a format of `__SYSCALL_64/X32(*index*, *handler_entry*)` in `syscalls_64.h`. The header file shall be regenerated if there is any changes in `syscalltbl.sh` or `syscall_64.tbl`. In fact, this is a universal approach for every hardware architecture that supports the Linux Kernel to automatically create the syscall header. If you look into the source code of version 5.4, there is some `Makefile` in each subfolder under `/arch/` that serves the same purpose like the commands above.
 
 Now let’s see how syscall numbers and syscall handler are mapped in `syscall_64.tbl`:
 
@@ -117,7 +117,7 @@ Now let’s see how syscall numbers and syscall handler are mapped in `syscall_6
 ...
 ```
 
-It's clear from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also easily distinguish their type based on the prefix of the handler entry. 
+It's clear from the clip above that this file supports three types of ABI: `common` (for both 32-bit and 64-bit), `64` (for 64-bit), and `x32` (for 32-bit). You can also easily distinguish their type based on the prefix of the handler entry.
 
 # Define a system call handler
 
@@ -131,7 +131,7 @@ Let's take `read` as an exmaple again. The actual implementation locates in `/fs
 SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 ```
 
-This doesn't seem like an ordinary defination of a function, so what is `SYSCALL_DEFINE3` macro and how does the Linux Kernel turn the above definition into `__x64_sys_read` in the syscall table? 
+This doesn't seem like an ordinary defination of a function, so what is `SYSCALL_DEFINE3` macro and how does the Linux Kernel turn the above definition into `__x64_sys_read` in the syscall table?
 
 If we go back to the definition of syscall table, we shall find that it is defined as an array of `sys_call_ptr_t`, which based on its name, we know it should be a function pointer pointing to syscall handler. It is defined in `/arch/x86/include/asm/syscall.h` as follows:
 
@@ -224,7 +224,7 @@ Now we have reached the end of syscalls that takes no argument (e.g., `fork` and
 
 In short, this macro involves multiple declaration and definition to hide the process of extracting arguments from register context. But let’s start with the invocation chain first. Using `read` as an example, the invocation chain is `__x64_sys_read` -> `__se_sys_read` -> `__do_sys_read`. Therefore, the code for `read` is within a local function named `__do_sys_read`. Now we will move on to the more complicated process -- the declaration and extraction of syscall arguments.
 
-## How to deal with different number of arguments? 
+## How to deal with different number of arguments?
 
 Let's parse the above definition of `__SYSCALL_DEFINEx` into the three functions and go through them one by one.
 
@@ -245,7 +245,7 @@ asmlinkage long __x64_sys##name(const struct pt_regs *regs)
 		,,regs->r10,,regs->r8,,regs->r9)			\
 ```
 
-### Cast the register content into the required type 
+### Cast the register content into the required type
 
 ```c
 static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))
@@ -255,6 +255,7 @@ static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))
 	return ret;
 }
 ```
+
 ### Invocation of the ultimate syscall handler
 
 ```c
@@ -297,4 +298,4 @@ Now let’s see how `__MAP` macro deals with handler arguments. The definition i
 
 ```
 
-`__MAP<n>` series is a recursive definition. 
+`__MAP<n>` series is a recursive definition.
