@@ -1,4 +1,4 @@
----
+(---
 layout: post
 title: "Syscall 301: A Deep Dive into the System Calls in Linux Kernel"
 date: 2024-03-09 11:14:00-0400
@@ -230,12 +230,15 @@ Let's parse the above definition of `__SYSCALL_DEFINEx` into the three functions
 
 ### Extract the maximum number of arguments from register context
 
+
 ```c
 asmlinkage long __x64_sys##name(const struct pt_regs *regs)
 {
 	return __se_sys##name(SC_X86_64_REGS_TO_ARGS(x,__VA_ARGS__));
 }
 ```
+
+The first function `__x64_sys##name()` is the exposed syscall entry. The argument `struct pt_regs` is where values of all registers are saved and `x` is the number of arguments for this syscall. As we mentioned before, a syscall takes at most 6 arguments, passing via `%rdi, %rsi, %rdx, %rcx, %r8, %r9` in left-to-right order. Therefore, the first step is to extract these 6 arguments from the full register context to avoid any unnecessary exposure of register information. This is performed by the following`SC_X86_64_REGS_TO_ARGS` macro. 
 
 ```c
 /* Mapping of registers to parameters for syscalls on x86-64 and x32 */
@@ -245,7 +248,19 @@ asmlinkage long __x64_sys##name(const struct pt_regs *regs)
 		,,regs->r10,,regs->r8,,regs->r9)			\
 ```
 
+The details of `__MAP` will be discussed later, but in short, this macro concatenate the variable and its type together in a certain format. Here is what we get after expanding `__MAP`.
+
+```c
+asmlinkage long __x64_sys##name(const struct pt_regs *regs)
+{
+	return __se_sys##name(regs->di,regs->si,regs->dx,
+						regs->r10,regs->r8,regs->r9);
+}
+```
+
 ### Cast the register content into the required type
+
+Now we move on to the second function `__se_sys##name()`. 
 
 ```c
 static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))
