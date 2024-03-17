@@ -59,7 +59,25 @@ sequenceDiagram
 
 ## General workflow
 
-Let’s use `read()` from `unistd.h` to demonstrate how developer uses library function to invoke the underlying syscall. Here is a general summary of syscall workflow. 
+### Invoke a syscall from user space
+
+**User**: Typically, there is certain library function that encapsulate the service that users need. You only need to call this function and pass the necessary arguments to it without any direct interaction with the Kernel.
+
+**Library function (in the user space)**: Libraries typically know the list of syscall number via a specific header provided by the operating system. A library function that wraps around a syscall will pass the syscall number and arguments from user to the Kernel by actively trapping into the Kernel mode via special instruction.
+
+### Trap into the Kernel space
+
+**Mode switch**: Despite of the difference in underlying architecture, each ISA provides its own instruction for a program in user mode to actively trap into the Kernel mode.
+
+**Syscall entry (in the Kernel)**: 
+
+### Execute the syscall handler
+
+### Return from the Kernel space
+
+### Example of syscall execution 
+
+Let’s use `read()` from `unistd.h` to demonstrate how developer uses library function to invoke the underlying syscall. Here is what would happen if the user tries to read out data from a socket. 
 
 ```mermaid
 sequenceDiagram
