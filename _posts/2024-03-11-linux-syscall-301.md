@@ -254,7 +254,7 @@ The details of `__MAP` will be discussed later, but in short, this macro concate
 asmlinkage long __x64_sys##name(const struct pt_regs *regs)
 {
 	return __se_sys##name(regs->di,regs->si,regs->dx,
-						regs->r10,regs->r8,regs->r9);
+				regs->r10,regs->r8,regs->r9);
 }
 ```
 
