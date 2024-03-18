@@ -35,7 +35,7 @@ asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 Remember we talked about the how unrealistic to manually initialize the syscall table in the previous artical? Here we are going to unveal the magic trick applied by the Linux Kernel, which is the use of `#define`, `#include`, and `#undef`.
 
 > The first `__SYSCALL_64` generates the declaration of every syscall handler.
->
+> 
 > The second `__SYSCALL_64` loads the address syscall handler into the `sys_call_table`, using their syscall number as the index within the syscall table array.
 
 Such a creative way of using the feature of C during the preprocessing phase! By defining, undefining, and redefining only one macro, the preprocessor could automatically generate all declaration of every syscall handler and the whole syscall table! How seemingless yet highly efficient it is!
@@ -226,10 +226,59 @@ In short, this macro involves multiple declaration and definition to hide the pr
 
 ## How to deal with different number of arguments?
 
-Let's parse the above definition of `__SYSCALL_DEFINEx` into the three functions and go through them one by one.
+As shown above, the definition of `__SYSCALL_DEFINEx` consist of three functions. Before we go through them one by one, we are going to introduce some important macros that appears in all three of them.
+
+### Definition of argument lists via `__MAP`
+
+Now let’s see how `__MAP` macro deals with handler arguments. The definition is within `/include/linux/syscalls.h` as follows:
+
+```c
+/*
+ * __MAP - apply a macro to syscall arguments
+ * __MAP(n, m, t1, a1, t2, a2, ..., tn, an) will expand to
+ *    m(t1, a1), m(t2, a2), ..., m(tn, an)
+ * The first argument must be equal to the amount of type/name
+ * pairs given.  Note that this list of pairs (i.e. the arguments
+ * of __MAP starting at the third one) is in the same format as
+ * for SYSCALL_DEFINE<n>/COMPAT_SYSCALL_DEFINE<n>
+ */
+#define __MAP0(m,...)
+#define __MAP1(m,t,a,...) m(t,a)
+#define __MAP2(m,t,a,...) m(t,a), __MAP1(m,__VA_ARGS__)
+#define __MAP3(m,t,a,...) m(t,a), __MAP2(m,__VA_ARGS__)
+#define __MAP4(m,t,a,...) m(t,a), __MAP3(m,__VA_ARGS__)
+#define __MAP5(m,t,a,...) m(t,a), __MAP4(m,__VA_ARGS__)
+#define __MAP6(m,t,a,...) m(t,a), __MAP5(m,__VA_ARGS__)
+#define __MAP(n,...) __MAP##n(__VA_ARGS__)
+```
+
+`n` in `__MAP` is the number of type and number pairs to be concatenated together, and the corresponding `__MAP<n>` will be called next. As shown above, `__MAP<n>` series is a recursive definition, and it keeps appending type `t` with name `a` in the format of `m` until all pairs are adjoined. The format `m` makes `__MAP` macro extremely useful in both declaration, definition, and invocation. Now let’s take a close look at macros that are used as the concatenation format.
+
+### Adjoin the type with variable name via `__SC_*` 
+
+```c
+#define __SC_DECL(t, a)	t a
+#define __TYPE_AS(t, v)	__same_type((__force t)0, v)
+#define __TYPE_IS_L(t)	(__TYPE_AS(t, 0L))
+#define __TYPE_IS_UL(t)	(__TYPE_AS(t, 0UL))
+#define __TYPE_IS_LL(t) (__TYPE_AS(t, 0LL) || __TYPE_AS(t, 0ULL))
+#define __SC_LONG(t, a) __typeof(__builtin_choose_expr(__TYPE_IS_LL(t), 0LL, 0L)) a
+#define __SC_CAST(t, a)	(__force t) a
+#define __SC_TYPE(t, a)	t
+#define __SC_ARGS(t, a)	a
+#define __SC_TEST(t, a) (void)BUILD_BUG_ON_ZERO(!__TYPE_IS_LL(t) && sizeof(t) > sizeof(long))
+```
+
+The commonly used formats are also defined in `/include/linux/syscalls.h`, and their jobs are as follows:
+
+* `__SC_DECL`: define a variable named `a` as type `t`
+* `__SC_LONG`: define a variable named `a` as type `long` or `long long`
+* `__SC_CAST`: cast a variable named `a` as type `t` by force
+* `__SC_TYPE`: only keep the variable type `t`
+* `__SC_ARGS` : only keep the variable name `a`
+* `__SC_TEST`: report error if type `t` is not `long long` or `unsigned long long` but is still longer than a `long` type
 
 ### Extract the maximum number of arguments from register context
-
 
 ```c
 asmlinkage long __x64_sys##name(const struct pt_regs *regs)
@@ -276,41 +325,3 @@ static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))
 ```c
 static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 ```
-
-### Definition of argument lists via `__MAP`
-
-Now let’s see how `__MAP` macro deals with handler arguments. The definition is within `/include/linux/syscalls.h` as follows:
-
-```c
-/*
- * __MAP - apply a macro to syscall arguments
- * __MAP(n, m, t1, a1, t2, a2, ..., tn, an) will expand to
- *    m(t1, a1), m(t2, a2), ..., m(tn, an)
- * The first argument must be equal to the amount of type/name
- * pairs given.  Note that this list of pairs (i.e. the arguments
- * of __MAP starting at the third one) is in the same format as
- * for SYSCALL_DEFINE<n>/COMPAT_SYSCALL_DEFINE<n>
- */
-#define __MAP0(m,...)
-#define __MAP1(m,t,a,...) m(t,a)
-#define __MAP2(m,t,a,...) m(t,a), __MAP1(m,__VA_ARGS__)
-#define __MAP3(m,t,a,...) m(t,a), __MAP2(m,__VA_ARGS__)
-#define __MAP4(m,t,a,...) m(t,a), __MAP3(m,__VA_ARGS__)
-#define __MAP5(m,t,a,...) m(t,a), __MAP4(m,__VA_ARGS__)
-#define __MAP6(m,t,a,...) m(t,a), __MAP5(m,__VA_ARGS__)
-#define __MAP(n,...) __MAP##n(__VA_ARGS__)
-
-#define __SC_DECL(t, a)	t a
-#define __TYPE_AS(t, v)	__same_type((__force t)0, v)
-#define __TYPE_IS_L(t)	(__TYPE_AS(t, 0L))
-#define __TYPE_IS_UL(t)	(__TYPE_AS(t, 0UL))
-#define __TYPE_IS_LL(t) (__TYPE_AS(t, 0LL) || __TYPE_AS(t, 0ULL))
-#define __SC_LONG(t, a) __typeof(__builtin_choose_expr(__TYPE_IS_LL(t), 0LL, 0L)) a
-#define __SC_CAST(t, a)	(__force t) a
-#define __SC_TYPE(t, a)	t
-#define __SC_ARGS(t, a)	a
-#define __SC_TEST(t, a) (void)BUILD_BUG_ON_ZERO(!__TYPE_IS_LL(t) && sizeof(t) > sizeof(long))
-
-```
-
-`__MAP<n>` series is a recursive definition.
