@@ -252,7 +252,7 @@ Now let’s see how `__MAP` macro deals with handler arguments. The definition i
 #define __MAP(n,...) __MAP##n(__VA_ARGS__)
 ```
 
-`n` in `__MAP` is the number of type and number pairs to be concatenated together, and the corresponding `__MAP<n>` will be called next. As shown above, `__MAP<n>` series is a recursive definition, and it keeps appending type `t` with name `a` in the format of `m` until all pairs are adjoined. The format `m` makes `__MAP` macro extremely useful in both declaration, definition, and invocation. Now let’s take a close look at macros that are used as the concatenation format.
+The `n` in `__MAP` is the number of type and name pairs to be concatenated together, and the corresponding `__MAP<n>` will be selected. As shown above, `__MAP<n>` series is a recursive definition, and it keeps appending type `t` with name `a` in the format of `m` until all pairs are adjoined. The format `m` makes `__MAP` macro extremely useful in both declaration, definition, and invocation. Now let’s take a close look at macros that are used as the concatenation format.
 
 ### Adjoin the type with variable name via `__SC_*` 
 
@@ -325,3 +325,5 @@ static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))
 ```c
 static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 ```
+
+
