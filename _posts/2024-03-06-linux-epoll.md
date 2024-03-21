@@ -11,12 +11,18 @@ toc:
 
 In this artical, we are digging deep into the `Epoll` in Linux Kernel 5.4 on an `x86_64` architecture.
 
-# Structures and functionalities in a nutshell
+# Core concepts in `Epoll`
 
-|     Term     | Functionalities |
+## Epoll instance
+
+## File descriptors
+
+## Events
+
+<!-- |     Term     | Functionalities |
 | :----------: | :-------------: |
-|  eventpoll   |                 |
-|    epitem    |                 |
-| eppoll_entry |                 |
-|  ep_pqueue   |                 |
-| epoll_filefd |                 |
+|  eventpoll   |  Heart of `epoll` mechanism. Wait, collect and report events happened on files that are added to this object. |
+|    epitem    |  Represent each individual file descriptor that has been added to an eventpoll instance.  |
+| eppoll_entry | Structure to help adding epitem into the wait queue in eventpoll. | -->
+
+# Workflow of Epoll
