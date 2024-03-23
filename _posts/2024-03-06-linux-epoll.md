@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "I/O Multiplexing 301: Deep into the Heart of Eventpoll in Linux"
+title: "I/O Multiplexing 302: Deep into the Heart of Eventpoll in Linux"
 date: 2024-03-16 11:14:00-0400
 description:
 tags: Linux

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "I/O Multiplexing 201: Wait queue for blocking and waking up"
+title: "I/O Multiplexing 301: Wait queue for blocking and waking up"
 date: 2024-03-21 11:14:00-0400
 description:
 tags: Linux
@@ -14,6 +14,8 @@ In this artical, we are introducing the `wait queue` mechanism, which is the fun
 # What is `wait queue` and why does the Kernel need it
 
 `Wait queue` is the mechanism used by the Linux Kernel for blocking and waking up of processes to achieve more efficient CPU utilization. It is vital for implementing blocking I/O operations, event notification, and synchronization in the Kernel.
+
+# Overview of `wait queue` workflow
 
 # Structures used in `wait queue`
 
